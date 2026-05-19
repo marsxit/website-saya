@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GATEWAY INTERFACE - INFERNAL UNDERWORLD</title>
+    <style>
+        /* --- ROOT VARIABLES --- */
+        :root {
+            --bg-deep-hell: #060101;
+            --bg-magma-panel: rgba(16, 2, 2, 0.96);
+            --lava-bright: #ff4500;   
+            --lava-core: #ff0000;     
+            --lava-yellow: #ffcc00;   
+            --text-pure: #ffffff;
+            --text-ash: #fca9a9;
+            --border-crust: #6b0909;
+        }
+
+        /* --- GLOBAL & BODY STYLES --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-deep-hell);
+            color: var(--text-pure);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* --- CANVAS BACKGROUND STABILIZER --- */
+        #hellCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1; /* Dipindah ke paling belakang agar tidak menabrak elemen apa pun */
+            pointer-events: none;
+            display: block;
+        }
+
+        /* --- NAVIGATION BAR --- */
+        header {
+            width: 100%;
+            background: linear-gradient(180deg, #120101 0%, rgba(5, 0, 0, 0.95) 100%);
+            border-bottom: 4px solid var(--lava-bright);
+            box-shadow: 0 4px 30px rgba(255, 0, 0, 0.5);
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .logo {
+            font-family: 'Impact', sans-serif;
+            font-size: 26px;
+            letter-spacing: 2px;
+            color: #fff;
+            text-shadow: 0 0 10px var(--lava-core);
+        }
+
+        .logo span {
+            color: var(--lava-yellow);
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-ash);
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 1px;
+            padding: 10px 16px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #fff;
+            background: linear-gradient(180deg, var(--lava-bright) 0%, var(--lava-core) 100%);
+            box-shadow: 0 0 15px var(--lava-bright);
+        }
+
+        /* --- MAIN CONTAINER --- */
+        .container {
+            margin-top: 130px;
+            margin-bottom: 50px;
+            width: 92%;
+            max-width: 680px;
+            background-color: var(--bg-magma-panel);
+            border: 3px solid var(--border-crust);
+            border-radius: 16px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+            position: relative;
+            z-index: 10;
+        }
+
+        .panel-header {
+            background: #210303;
+            padding: 15px 20px;
+            border-bottom: 3px solid var(--lava-core);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .panel-title {
+            font-family: 'Impact', sans-serif;
+            font-size: 16px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 8px var(--lava-core);
+        }
+
+        .panel-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--lava-bright);
+            box-shadow: 0 0 8px var(--lava-bright);
+        }
+
+        .panel-content {
+            padding: 30px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active-section {
+            display: block;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h2 {
+            font-family: 'Impact', sans-serif;
+            color: #fff;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            font-size: 24px;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 10px var(--lava-core), 0 0 20px var(--lava-bright);
+        }
+
+        p {
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .status-box {
+            background-color: #000000;
+            border: 2px solid var(--border-crust);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: inset 0 0 15px rgba(255, 0, 0, 0.3);
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255,69,0,0.1);
+            padding-bottom: 6px;
+        }
+
+        .status-row:last-child { margin-bottom: 0; border: none; padding-bottom: 0; }
+        .status-label { color: var(--text-ash); font-weight: bold; }
+        .status-value { color: #fff; font-weight: bold; }
+        .status-value.online { color: var(--lava-yellow); text-shadow: 0 0 10px var(--lava-core); }
+
+        /* --- LAVA DRIP BUTTON SYSTEM (RESPONSIVE SVG) --- */
+        .btn-wrapper {
+            position: relative;
+            margin-top: 30px;
+            width: 100%;
+        }
+
+        .btn-action {
+            display: block;
+            width: 100%;
+            background: linear-gradient(180deg, var(--lava-yellow) 0%, var(--lava-bright) 50%, var(--lava-core) 100%);
+            color: #ffffff;
+            border: 2px solid var(--lava-yellow);
+            padding: 16px;
+            font-family: 'Impact', sans-serif;
+            font-size: 20px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            position: relative;
+            z-index: 5;
+            box-shadow: 0 4px 15px rgba(255, 69, 0, 0.4);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+            transition: transform 0.1s;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+        }
+
+        .lava-svg-container {
+            position: absolute;
+            bottom: -22px;
+            left: 0;
+            width: 100%;
+            height: 25px;
+            z-index: 4;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .lava-svg-container svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .lava-path {
+            fill: var(--lava-core);
+            animation: lavaWobble 2.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes lavaWobble {
+            0% { d: path("M0,0 L100,0 L100,40 C80,45 70,10 50,35 C30,45 20,10 0,25 Z"); }
+            100% { d: path("M0,0 L100,0 L100,25 C85,15 65,45 50,20 C35,40 15,15 0,35 Z"); }
+        }
+
+        /* --- GALLERY GRID --- */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .gallery-item {
+            background-color: #000;
+            border: 2px solid var(--border-crust);
+            border-radius: 8px;
+            height: 140px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* --- CONTACT CARDS (PURE HTML - NO POPUP BLOCKER) --- */
+        .social-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin-top: 15px;
+        }
+
+        .social-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        /* Mengembalikan fungsi murni tag <a> agar lancar dibuka di hp/laptop */
+        .social-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #140202;
+            border: 2px solid var(--border-crust);
+            padding: 20px;
+            border-radius: 8px;
+            text-decoration: none; 
+            color: var(--text-pure);
+            position: relative;
+            z-index: 5;
+            transition: all 0.2s;
+        }
+
+        .social-card:hover {
+            border-color: var(--lava-bright);
+            box-shadow: 0 0 20px rgba(255,69,0,0.3);
+            transform: translateY(-2px);
+        }
+
+        .social-info h3 {
+            font-family: 'Impact', sans-serif;
+            font-size: 18px;
+            letter-spacing: 1px;
+            color: #fff;
+            text-shadow: 0 0 5px var(--lava-core);
+        }
+
+        .social-info p {
+            font-size: 13px;
+            color: var(--lava-yellow);
+        }
+
+        .btn-visit {
+            background: linear-gradient(180deg, var(--lava-bright) 0%, #7a000d 100%);
+            color: #fff;
+            border: 1px solid var(--lava-yellow);
+            padding: 8px 16px;
+            font-family: 'Impact', sans-serif;
+            font-size: 13px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="hellCanvas"></canvas>
+
+    <header>
+        <nav>
+            <div class="logo">MARS<span>.XIT</span></div>
+            <ul class="nav-links">
+                <li><a href="#home" class="active" onclick="switchTab('home')">Home</a></li>
+                <li><a href="#profile" onclick="switchTab('profile')">Profile</a></li>
+                <li><a href="#gallery" onclick="switchTab('gallery')">Gallery</a></li>
+                <li><a href="#contact" onclick="switchTab('contact')">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="panel-header">
+            <div class="panel-title">DATABASE</div>
+            <div class="panel-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+
+        <div class="panel-content">
+            
+            <div id="home" class="section active-section">
+                <h2>SYSTEM OPERATIONAL</h2>
+                <div class="status-box">
+                    <div class="status-row">
+                        <span class="status-label">STATUS:</span>
+                        <span class="status-value online">ONLINE</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">ADMIN:</span>
+                        <span class="status-value">MARSX</span>
+                    </div>  
+                </div>
+                <p style="color: var(--text-ash);">
+                    Selamat datang di antarmuka pangkalan data personal. Halaman ini akan membawa anda untuk mengenal Mars. Gunakan navigasi menu untuk mengakses informasi lengkap.
+                </p>
+                
+                <div class="btn-wrapper">
+                    <button class="btn-action" onclick="switchTab('profile')">		PROFILE DATA</button>
+                    <div class="lava-svg-container">
+                        <svg viewBox="0 0 100 50" preserveAspectRatio="none">
+                            <path class="lava-path" d="M0,0 L100,0 L100,40 C80,45 70,10 50,35 C30,45 20,10 0,25 Z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div id="profile" class="section">
+                <h2>INTRODUCE</h2>
+                <div class="status-box">
+                    <div class="status-row">
+                        <span class="status-label">Nama Lengkap:</span>
+                        <span class="status-value">Marshall Melody Putra</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">Signature Code:</span>
+                        <span class="status-value">MARSX / Mars</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">Program Keahlian:</span>
+                        <span class="status-value">Visual Communication Design (DKV)</span>
+                    </div>
+                </div>
+                <h2>TERRITORY</h2>
+                <p style="color: var(--text-ash);">
+                    Menempuh pendidikan menengah kejuruan di <strong>SMK PGRI 2 Cibinong</strong>.<br>
+                    Fokus pada pengembangan media visual, antarmuka digital, serta penyesuaian konfigurasi efisiensi sistem kerja perangkat PC maupun mobile.
+                </p>
+            </div>
+
+            <div id="gallery" class="section">
+                <h2>VISUAL GALLERY</h2>
+                <p style="color: var(--text-ash); margin-bottom: 15px;">Dokumentasi project, layouting antarmuka, dan eksperimen grafis digital.</p>
+                
+                <div class="gallery-grid">
+                    <div class="gallery-item"><img src="gambar1.jpg" alt="Project 1"></div>
+                    <div class="gallery-item"><img src="gambar2.jpg" alt="Project 2"></div>
+                    <div class="gallery-item"><img src="gambar3.jpg" alt="Project 3"></div>
+                    <div class="gallery-item"><img src="gambar4.jpg" alt="Project 4"></div>
+                </div>
+            </div>
+
+            <div id="contact" class="section">
+                <h2>EXTERNAL GATEWAY</h2>
+                <p style="color: var(--text-ash); margin-bottom: 20px;">Support Dengan Klik Follow Akun Dibawah</p>
+                
+                <div class="social-container">
+                    <div class="social-wrapper">
+                        <a href="https://www.instagram.com/marsplnt4" target="_blank" rel="noopener noreferrer" class="social-card">
+                            <div class="social-info">
+                                <h3>INSTAGRAM REALM</h3>
+                                <p>@marsplnt4</p>
+                            </div>
+                            <span class="btn-visit">BRIDGE NOW</span>
+                        </a>
+                        <div class="lava-svg-container">
+                            <svg viewBox="0 0 100 50" preserveAspectRatio="none">
+                                <path class="lava-path" d="M0,0 L100,0 L100,40 C80,45 70,10 50,35 C30,45 20,10 0,25 Z" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="social-wrapper">
+                        <a href="https://www.tiktok.com/@marsxyy_" target="_blank" rel="noopener noreferrer" class="social-card">
+                            <div class="social-info">
+                                <h3>TIKTOK STREAM</h3>
+                                <p>@marsxyy_</p>
+                            </div>
+                            <span class="btn-visit">BRIDGE NOW</span>
+                        </a>
+                        <div class="lava-svg-container">
+                            <svg viewBox="0 0 100 50" preserveAspectRatio="none">
+                                <path class="lava-path" d="M0,0 L100,0 L100,40 C80,45 70,10 50,35 C30,45 20,10 0,25 Z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // NAVIGATION TABS CONTROL
+        function switchTab(tabId) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active-section'));
+
+            const activeSection = document.getElementById(tabId);
+            if(activeSection) activeSection.classList.add('active-section');
+
+            const links = document.querySelectorAll('.nav-links a');
+            links.forEach(link => {
+                link.classList.remove('active');
+                if(link.getAttribute('href') === '#' + tabId) link.classList.add('active');
+            });
+        }
+
+        // --- ANTI-GAGA ENGINE: CANVAS RENDER PARTIKEL ---
+        const canvas = document.getElementById('hellCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        let bolts = [];
+        let sparks = [];
+
+        // Generate partikel abu vulkanik
+        for(let i = 0; i < 60; i++) {
+            sparks.push({
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                size: Math.random() * 3 + 1,
+                speedY: Math.random() * 1.5 + 0.5,
+                speedX: (Math.random() - 0.5) * 1,
+                alpha: Math.random() * 0.8 + 0.2
+            });
+        }
+
+        function draw() {
+            // Bersihkan frame canvas di setiap loop
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. ANIMASI PETIR NERAKA (STABIL)
+            if(Math.random() < 0.02 && bolts.length < 2) {
+                let sx = Math.random() * canvas.width;
+                bolts.push({
+                    x: sx,
+                    tx: sx + (Math.random() - 0.5) * 100,
+                    life: 1.0
+                });
+            }
+
+            for(let b = bolts.length - 1; b >= 0; b--) {
+                let lightning = bolts[b];
+                ctx.strokeStyle = `rgba(255, 40, 0, ${lightning.life})`;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(lightning.x, 0);
+                ctx.lineTo(lightning.x + 20, canvas.height * 0.4);
+                ctx.lineTo(lightning.tx - 20, canvas.height * 0.7);
+                ctx.lineTo(lightning.tx, canvas.height);
+                ctx.stroke();
+
+                lightning.life -= 0.1;
+                if(lightning.life <= 0) bolts.splice(b, 1);
+            }
+
+            // 2. ANIMASI ABU PIJAR MENERBANG
+            for(let s = 0; s < sparks.length; s++) {
+                let p = sparks[s];
+                p.y -= p.speedY;
+                p.x += p.speedX;
+
+                ctx.fillStyle = `rgba(255, 90, 0, ${p.alpha})`;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Balikkan partikel ke bawah kalau sudah lewat batas atas layar
+                if(p.y < -10) {
+                    p.y = canvas.height + 10;
+                    p.x = Math.random() * canvas.width;
+                }
+            }
+
+            requestAnimationFrame(draw);
+        }
+
+        // Jalankan loop render
+        draw();
+    </script>
+</body>
+</html>
